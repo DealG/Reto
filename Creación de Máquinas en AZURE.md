@@ -73,7 +73,173 @@ Crearemos las redes en base a nuestra infraestructura de red:
 
 ![image-20220209171805804](imagenes/image-20220209171805804.png)
 
-Crearemos la red " 172.16.0.0/16" y 2 subredes nuestro DMZ "172.16.100.0/24" y la Red-Inerna"172.16.200.0/24":
+Crearemos la red " 172.16.0.0/16" y 3 subredes, nuestro DMZ "172.16.100.0/24", la Red-Inerna"172.16.200.0/24" y la "172.16.0.0/24" con salida a internet:
+
+![image-20220209172015353](../imagenes/image-20220209172015353.png)
+
+Nos tendría que salír algo parecido:
+
+![image-20220210074138310](imagenes/image-20220210074138310.png)
+
+Dentro de este, para tener una mejor visualización de nuestra red, tendremos a nuestra disposción, dentro del apartado de "Supervisión" > "Diagrama" para poder mejor nuestra red:
+
+![image-20220210075111705](imagenes/image-20220210075111705.png)
+
+Una vez creado esto, crearemos nuestras máquinas virtuales.
+
+<h4>3. Creación de Máquinas Virtuales</h4>
+
+Para ello vamos a "Todos los servicios" > "Compute" > "Máquinas Virtuales":
+
+![image-20220209165130035](imagenes/image-20220209165130035.png)
+
+Le damos a "Crear" en la parte superior izquierda de esta:
+
+![image-20220210082437479](imagenes/image-20220210082437479.png)
+
+Una vez dentro de está, pondremos los datos y el tamaño de la máquina que queremos crear:
+
+
+
+![image-20220210083248217](imagenes/image-20220210083248217.png)
+
+Como podemos observar, AZURE nos permite configurar muchas cosas de la máquina virtual, también generar un par de claves SSH para que podamos conectarnos o mediante contraseña.
+
+En este caso, al estár en una cuenta de "AZURE FOR STUDENTS" no nos permite crear más máquinas virtuales de las que tenemos actualmente, en este caso podemos realizar las configuraciones previas y revisar que todo este en orden:
+
+En "Discos" podemos elegir el tipo de discos que prefiramos:
+
+![image-20220210083912112](imagenes/image-20220210083912112.png)
+
+Le damos a "siguiente" y elegimos nuestra <b>red virtual</b> , también podemos elegir a la subred la cual conectaremos nuestra máquina virtual y si queremos asignarle una "IP Pública" en nuestro caso le asignaremos una, para que nuestros compañeros puedan conectarse a las máquinas y realizar las configuraciones necesarias (más adelante veremos como configurar una VPN para que no necesiten de estás).
+
+Le damos a "siguiente":
+
+![image-20220210084744555](imagenes/image-20220210084744555.png)
+
+Dejamos la configuración por defecto y le damos a "siguiente":
+
+![image-20220210084955718](imagenes/image-20220210084955718.png)
+
+En "Opciones Avanzadas" podemos indicarle que si queremos crear nuestra máquina e instalarle una extensión, que ejecute algún script o realizar algún otro cambio, en nuestro caso  no realizaremos nada y le damos a "siguiente":
+
+![image-20220210085148108](imagenes/image-20220210085148108.png)
+
+Una vez visto eso, solo le dariamos a "Revisar y crear" abajo a la izquierda o a "siguiente" hasta el apartado "Revisar y crear".
+
+El resultado seria algo así:
+
+![image-20220210085534499](imagenes/image-20220210085534499.png)
+
+Realizamos los mismos pasos para nuestra segunda máquina virtual, cambiando las redes:
+
+![image-20220210090828245](imagenes/image-20220210090828245.png)
+
+<h4> Disco Duro Virtual</h4>
+
+Para crear nuestra máquina virtual de "Pfsense" lo haremos mediante un disco, ya que "pfsense" en azure no lo cubre nuestra suscripción, para ello, crearemos una cuenta de almacenamiento, "Todos los servicios" > "Almacenamiento" > "Cuentas de almacenamiento":
+
+![image-20220209165256173](imagenes/image-20220209165256173.png)
+
+le damos a "crear":
+
+![image-20220210091134674](imagenes/image-20220210091134674.png)
+
+
+
+Le indicamos que la cuenta de almacenamiento estará en nuestro proyecto que se encuentra en la región de "France Central":
+
+![](imagenes/image-20220210092317074.png)
+
+
+
+En "Opciones Avanzadas" dejamos los valores por defecto y le damos a "siguiente":
+
+![image-20220210092417832](imagenes/image-20220210092417832.png)
+
+Dejamos todo lo demás por defecto y le damos  a "Revisar y crear":
+
+![image-20220210113809656](imagenes/image-20220210113809656.png)
+
+
+
+Una vez creado, tendremos algo parecido a esto:
+
+
+
+![image-20220210125321128](imagenes/image-20220210125321128.png)
+
+
+
+le damos a "Blob Service" y a "Contenedor":
+
+![image-20220210125402514](imagenes/image-20220210125402514.png)
+
+
+
+Creamos nuestro contenedor, que contendra nuestro VHD con el software de pfsense:
+
+![image-20220210130010975](imagenes/image-20220210130010975.png)
+
+Elegimos nuestro disco vhd y en "Tipo de blob" elegimos "blob en páginas" y "cargar":
+
+![image-20220210130122852](imagenes/image-20220210130122852.png)
+
+Una vez subido nuestro disco VHD tendremos que crear un disco para nuestra máquina a partir de este, para ello vamos al apartado "discos"> "crear":
+
+![image-20220210130912760](imagenes/image-20220210130912760.png)
+
+Le indicamos el nombre del disco (un nombre cualquiera),  blob de origen, en ella cogemos el vhd que hemos creado previamente, en "Tipo de SO" le indicamos "Linux" y en "Genreación de VM" ponemos 1:
+
+![image-20220210131510576](imagenes/image-20220210131510576.png)
+
+Para el apartado del "Tamaño" le damos a "cambiar" y seleccionamos en "SKU de disco", "HDD estándar":
+
+![image-20220210131814210](imagenes/image-20220210131814210.png)
+
+Y ponemos el tamaño del disco que hemos creado (VHD) en mi caso es de 16GB:
+
+![image-20220210131852248](imagenes/image-20220210131852248.png)
+
+Lo demás lo dejamos por defect y le damos a "Revisar y crear".
+
+![image-20220210132056094](imagenes/image-20220210132056094.png)
+
+Una vez tengamos nuestro disco creado, podremos crear nuestra máquina a partir del disco duro, en el apartado de "redes" le asignamos una "ip publica" para que tenga acceso con el exterior:
+
+![image-20220210132231730](imagenes/image-20220210132231730.png)
+
+Una vez creada nuestra máquina de pfsense creamos otras 2 interfaces de red, que estarán conectadas una a la <i>DMZ</i> y otra a la <i>red Interna</i>.
+
+Para ello vamos a "Todos los servicios" > "Redes" > "Interfaces de red" y le damos a "Crear":
+
+![image-20220210134603012](imagenes/image-20220210134603012.png)
+
+![image-20220210140517903](imagenes/image-20220210140517903.png)
+
+Le damos a "Revisar y crear" y realizamos lo mismo con la interfaz de red de la "Red-Interna".
+
+![image-20220210141048018](imagenes/image-20220210141048018.png)
+
+
+
+Dentro de la configuración del pfsense, le adjuntaremos otras 2 tarjetas de red, que estarán conectadas a las otras 2 redes:
+
+![image-20220210132935357](imagenes/image-20220210132935357.png)
+
+
+
+Para ello, vamos a "Adjuntar Interfaz de red" y seleccionamos las interfaces de red que hemos creado:
+
+![image-20220210141448498](imagenes/image-20220210141448498.png)
+
+
+
+![image-20220210141556805](imagenes/image-20220210141556805.png)
+
+Realizamos el mismo proceso para la segunda interfaz de red:
+
+![image-20220210141641852](imagenes/image-20220210141641852.png)
 
 
 
@@ -85,106 +251,17 @@ Crearemos la red " 172.16.0.0/16" y 2 subredes nuestro DMZ "172.16.100.0/24" y l
 
 
 
-1. **Suma**: crea una función escribirSuma que reciba un número n  y calcule la suma de los n primeros números naturales. Por ejemplo si el número introducido es 4, escribiremos el resultado de sumar 1 + 2 + 3 + 4.   Comprobaciones previas: que el número sea mayor que cero
-
-- Recomendación: resuelve primero el problema sin función, fijando tú el valor del número. Una vez lo tengas añade la estructura de función.
-- Recomendación: Necesitarás tener una variable acumuladora en la que vayas almacenando la suma parcial. Los acumuladores...
-  - Se inicializan antes del bucle: si lo haces dentro del bucle se inicializarán a cada vuelta
-  - Se imprimen después del bucle: si lo haces dentro del bucle se irán imprimiendo los valores parciales
-  
-  Solución:
 
 
-```php+html
-
-```
-
-2. **Potencia**: función escribirPotencia que reciba dos números a y b y calcule la potencia a elevado a b utilizando iteraciones (no una función matemática predefinida). Por ejemplo, calcularemos `2^3` como `2*2*2`. Utilizar estructura "while"
-
-- Pista: el exponente (3 en el ejemplo) es el que actúa de contador y te sirve para ajustar el número de veces que multiplicamos
-
-  Solución:
 
 
-```php+html
 
-```
 
-3. **Factorial**: función obtenerFactorial que reciba un número x y calcule su factorial utilizando iteraciones. Utilizar estructura "for"
-   - Pista: este ejercicio es muy parecido al primero de suma, pero con multiplicaciones en lugar de sumas
 
-```php+html
 
-```
 
-4. **Strings como arrays**. Codifica una función `escribirLetras` que reciba un texto y escriba una lista ordenada con sus letras una a una, por ejemplo:
 
-```
-1. h
-2. o
-3. l
-4. a
-```
 
-Solución:
-
-```php+html
-
-```
-
-5. **Espejo**: Crea una función `escribirEspejo` que reciba un texto y escriba su espejo: por ejemplo si escribo "hola a todos" el programa escribirá "sodot a aloh"
-
-6. * Recomendación: comienza haciendo una versión en la que escribas el texto al derecho ("hola a todos") pero carácter a carácter. Cuando lo tengas funcionando, será más sencillo darle la vuelta
-
-   Solución:
-
-```php+html
-
-```
-
-7. **Recorte**: función `escribirRecorte` que reciba una cadena de texto y la muestre varias veces: en cada línea se mostrará un carácter menos que en la anterior. Este ejercicio es algo más complejo ya que requiere un bucle interno (un bucle dentro de otro).
-
-* Recomendación: empieza haciendo una versión en la que "Mi casa" (frase de 7 caracteres) aparezca completa siete veces en forma de párrafos:
-```
-   Mi casa
-   Mi casa
-   Mi casa
-   Mi casa
-   Mi casa
-   Mi casa
-   Mi casa
-```
-
-* Cuando lo tengas funcionando, debes lograr lo mismo pero de forma que cada uno de los párrafos se escriba letra a letra: es decir, añadirás un bucle interno en el que repetirás algo parecido a lo que hiciste en el ejercicio 4 (pero sin listas).
-
-* Ahora intenta utilizar el contador del bucle externo para que quede un resultado así:
-
-```
-   Mi casa
-   Mi cas
-   Mi ca
-   Mi c
-   Mi 
-   Mi
-   M 
-```
-Solución: 
-
-```php+html
-
-```
-
-8. **Notas**. Almacenar las notas de varios módulos (por ejemplo IAW, SRI y EIE) y escribir en pantalla la nota media. A la hora de calcular la media, no escribas manualmente "3": averigua cuántos módulos hay utilizando la función adecuada.
-
-   Solución: 
-
-```php+html
-
-```
-
-9. **Agenda**:  Codifica una agenda telefónica en forma de array asociativo y añade algunos contactos para que haya al menos seis elementos. Codifica un programa que muestre la agenda en forma de tabla: la columna izquierda serán los nombres y la columna derecha los números. Incluye cabeceras de tabla para indicar el contenido de cada columna. Cuando lo tengas resuelto, modifica el programa para que las celdas pares se muestren con un fondo de color claro (por ejemplo *lightblue*, *lightgray*, etc).
-
-   Solución:
 
 
 
